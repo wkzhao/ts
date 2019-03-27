@@ -3,7 +3,7 @@ import {LoggerFactory} from '../util/logger';
 import {timeCounter} from '../middlewares/TimeCounter';
 import {User} from '../domain/User';
 
-const logger = LoggerFactory.getLogger('LeadController');
+const logger = LoggerFactory.getLogger('UserController');
 
 // url映射，timeCounter中间件
 @Controller('/user', [timeCounter])
