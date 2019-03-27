@@ -24,6 +24,7 @@ export class Application {
         this.app.use(responseMethod);
 
         this.loadControllers(path.join(__dirname, './controller'));
+
         this.app.use(this.globalRouter.routes());
     }
 
@@ -42,6 +43,7 @@ export class Application {
         );
     }
 
+    // 注册路由
     private registerRouters (controller: any): void{
         if (!controller){
             return;
@@ -57,6 +59,8 @@ export class Application {
             if (proto[property] && proto[property].subPath){
                 const fullPath = (prefix + proto[property].subPath).replace(/\/{2,}/g, '/');
                 const method = proto[property].requestMethod;
+
+                // 累加中间件
                 const fullMiddleWares: MiddleWare[] = [];
                 if (middleWares){
                     fullMiddleWares.concat(middleWares);
@@ -73,6 +77,7 @@ export class Application {
                     const args: any = [];
                     if (paramList) {
 
+                        // 参数绑定
                         const paramKeys = Object.getOwnPropertyNames(paramList);
                         paramKeys.forEach((paramName) => {
                             const index = paramList[paramName];
@@ -84,6 +89,7 @@ export class Application {
 
                 };
 
+                // 添加中间件
                 if (middleWares){
                     router.use(...middleWares);
                 }

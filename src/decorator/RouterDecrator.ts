@@ -5,6 +5,13 @@ export const REQUEST_BODY = 'RequestBody';
 
 export type MiddleWare = (context: Context, next: NextFunction) => void;
 
+/**
+ * 各个装饰器在类的原型上添加数据
+ * path+subPath 完整路径
+ * method 请求方法get，post等
+ * middleWares 中间件
+ */
+
 // 类装饰器
 export function Controller (path= '/', middleWares?: MiddleWare[]) {
     return (target: any) => {

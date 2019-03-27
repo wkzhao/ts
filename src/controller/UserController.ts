@@ -5,6 +5,7 @@ import {User} from '../domain/User';
 
 const logger = LoggerFactory.getLogger('LeadController');
 
+// url映射，timeCounter中间件
 @Controller('/user', [timeCounter])
 export default class UserController {
 
