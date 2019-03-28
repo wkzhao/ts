@@ -1,10 +1,9 @@
 import {Context} from 'koa';
-import {NextFunction} from 'express';
 import {LoggerFactory} from '../util/logger';
 
 const logger = LoggerFactory.getLogger('TimeCounter');
 
-export async function timeCounter (context: Context, next: NextFunction) {
+export async function timeCounter (context: Context, next: () => Promise<any>) {
 
     const start = Date.now();
     await next();

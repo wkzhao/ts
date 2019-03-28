@@ -1,7 +1,6 @@
 import {Context} from 'koa';
-import {NextFunction} from 'express';
 
-export async function responseMethod (context: Context, next: NextFunction) {
+export async function responseMethod (context: Context, next: () => Promise<any>) {
 
     await next();
 
