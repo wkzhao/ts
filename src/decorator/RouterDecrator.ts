@@ -44,6 +44,16 @@ export function RequestParam (paramName: string) {
 }
 
 // 参数装饰器
+export function PathVariable (paramName: string) {
+    return (target: any, methodName: string, index: number) => {
+
+        const  params = target[methodName].paramList || {};
+        params[paramName] = index;
+        target[methodName].paramList = params;
+    };
+}
+
+// 参数装饰器
 export function RequestBody () {
     return (target: any, methodName: string, index: number) => {
 

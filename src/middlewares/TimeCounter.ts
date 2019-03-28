@@ -9,6 +9,6 @@ export async function timeCounter (context: Context, next: NextFunction) {
     const start = Date.now();
     await next();
     const end = Date.now();
-    logger.info('cost ' + (end - start) + ' ms');
+    logger.info(`${context.request.url} cost  ${(end - start)}  ms `);
 
 }

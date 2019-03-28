@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import bodyParser from 'koa-bodyparser';
 import {LoggerFactory} from './util/logger';
 import {responseMethod} from './middlewares/ResHandle';
+import {factory} from './decorator/Factory';
 
 const logger = LoggerFactory.getLogger('Application');
 export class Application {
@@ -23,33 +24,46 @@ export class Application {
 
         this.app.use(responseMethod);
 
-        this.loadControllers(path.join(__dirname, './controller'));
+        this.loadComponents([
+            path.join(__dirname, './controller'),
+            path.join(__dirname, './service'),
+            path.join(__dirname, './dao')
+        ]);
 
         this.app.use(this.globalRouter.routes());
     }
 
-    // 递归加载controller目录下的ts文件
-    private loadControllers (filePath: string): void{
-        const files = fs.readdirSync(filePath);
-        files.forEach((file) => {
-            const newFilePath = path.join(filePath, file);
-            if (fs.statSync(newFilePath).isDirectory()){
-                this.loadControllers(newFilePath);
-            }else{
-                const controller = require(newFilePath);
-                this.registerRouters(controller);
-            }
-            }
-        );
+    // 注册组件
+    private loadComponents (componentPaths: string[]): void{
+        for (const componentPath of componentPaths){
+            const files = fs.readdirSync(componentPath);
+            files.forEach((file) => {
+                    const newFilePath = path.join(componentPath, file);
+                    if (fs.statSync(newFilePath).isDirectory()){
+                        return this.loadComponents([newFilePath]);
+                    }
+
+                    const component = require(newFilePath);
+                    const proto = component.default.prototype;
+
+                    if (proto.injectName){
+                        factory[proto.injectName] = new component.default();
+                    }else {
+                        this.registerRouters(proto);
+                    }
+
+                }
+            );
+        }
     }
 
     // 注册路由
-    private registerRouters (controller: any): void{
-        if (!controller){
+    private registerRouters (controllerProto: any): void{
+        if (!controllerProto){
             return;
         }
 
-        const proto = controller.default.prototype;
+        const proto = controllerProto;
         const prefix = proto.path;
         const middleWares: MiddleWare[] = proto.middleWares;
 
@@ -82,7 +96,8 @@ export class Application {
                         paramKeys.forEach((paramName) => {
                             const index = paramList[paramName];
                             args[index] = paramName === REQUEST_BODY ?
-                                JSON.parse(JSON.stringify(context.request.body)) : context.query[paramName];
+                                JSON.parse(JSON.stringify(context.request.body))
+                                : context.query[paramName] || context.params[paramName] ;
                         });
                     }
                     context.body = await proto[property].apply(proto, args);
@@ -90,8 +105,8 @@ export class Application {
                 };
 
                 // 添加中间件
-                if (middleWares){
-                    router.use(...middleWares);
+                if (fullMiddleWares){
+                    router.use(...fullMiddleWares);
                 }
                 router[method](fullPath, asyncMethod);
                 this.globalRouter.use(router.routes());
