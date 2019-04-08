@@ -1,9 +1,8 @@
-import {NextFunction} from 'express';
 import {Context} from 'koa';
 
 export const REQUEST_BODY = 'RequestBody';
-
-export type MiddleWare = (context: Context, next: NextFunction) => void;
+export type Next = () => Promise<any>;
+export type MiddleWare = (context: Context, next: Next) => void;
 
 /**
  * 各个装饰器在类的原型上添加数据

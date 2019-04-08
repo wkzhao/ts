@@ -6,6 +6,7 @@
   "author": "wenkun.zhao",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.11",
     "winston": "^3.2.1"
   },
   "devDependencies": {
